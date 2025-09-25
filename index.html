@@ -1,1 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raphaël Guiller — RG.card</title>
+<style>
+  :root {
+    --bg1: #0f2027;
+    --bg2: #203a43;
+    --bg3: #2c5364;
+    --neon: #00f5ff;
+    --neon2: #ff00ff;
+    --white: #fff;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));
+    background-size:400% 400%;
+    animation:bgMove 12s ease infinite;
+    font-family: "Inter", sans-serif;
+  }
+  @keyframes bgMove {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+  }
+  .scene {
+    width:300px; height:200px;
+    perspective:1000px;
+  }
+  .card {
+    width:100%; height:100%;
+    position:relative;
+    transform-style:preserve-3d;
+    animation:spin 12s linear infinite;
+  }
+  @keyframes spin {
+    from { transform:rotateY(0deg); }
+    to { transform:rotateY(360deg); }
+  }
+  .face {
+    position:absolute; width:100%; height:100%;
+    backface-visibility:hidden;
+    border-radius:16px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    color:var(--white); font-weight:600; text-align:center;
+    padding:20px;
+    background:rgba(255,255,255,0.05);
+    border:1px solid rgba(255,255,255,0.2);
+    box-shadow:0 0 25px var(--neon);
+  }
+  .front { }
+  .back { transform:rotateY(180deg); background:rgba(255,255,255,0.08); box-shadow:0 0 25px var(--neon2); }
+  h1 { font-size:1.2rem; margin-bottom:4px; }
+  h2 { font-size:.9rem; font-weight:400; margin-bottom:12px; }
+  .info { font-size:.8rem; line-height:1.5; }
+  .btn {
+    margin-top:12px;
+    padding:8px 16px;
+    background:var(--neon);
+    color:#000;
+    font-weight:700;
+    border-radius:12px;
+    text-decoration:none;
+    box-shadow:0 0 12px var(--neon);
+    transition:all .2s;
+  }
+  .btn:hover { box-shadow:0 0 25px var(--neon2); background:var(--neon2); color:#fff; }
+</style>
+</head>
+<body>
+  <div class="scene">
+    <div class="card">
+      <!-- FACE AVANT -->
+      <div class="face front">
+        <h1>Raphaël Guiller</h1>
+        <h2>RG.card</h2>
+        <div class="info">PAS D’APPLI.<br>PAS DE STRESS.<br>IL SUFFIT DE PASSER.</div>
+      </div>
+      <!-- FACE ARRIÈRE -->
+      <div class="face back">
+        <div class="info">
+          📱 07 64 02 12 68<br>
+          ✉️ rg.businesscard@gmail.com<br>
+          📷 instagram.com/rg.card
+        </div>
+        <a class="btn" id="vcfBtn" href="#">Ajouter au contact</a>
+      </div>
+    </div>
+  </div>
 
+<script>
+  // Génération du VCF
+  function buildVCard(){
+    return new Blob([[
+      "BEGIN:VCARD","VERSION:3.0",
+      "N:Guiller;Raphaël;;;",
+      "FN:Raphaël Guiller",
+      "ORG:RG.card",
+      "TEL;TYPE=CELL:+33764021268",
+      "EMAIL;TYPE=INTERNET:rg.businesscard@gmail.com",
+      "URL;TYPE=Instagram:https://www.instagram.com/rg.card",
+      "END:VCARD"].join("\n")], {type:"text/vcard"});
+  }
+  const btn=document.getElementById("vcfBtn");
+  btn.addEventListener("click",(e)=>{
+    const blob=buildVCard();
+    const url=URL.createObjectURL(blob);
+    btn.href=url; btn.download="raphael-guiller.vcf";
+  },{once:true});
+</script>
+</body>
+</html>
