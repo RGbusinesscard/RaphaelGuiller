@@ -2,207 +2,90 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Raphaël Guiller — RG.card (3D gravure)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carte 3D Raphaël Guiller</title>
 <style>
-  html,body{height:100%;margin:0}
-  body{
-    background:radial-gradient(1200px 800px at 50% 60%, #0f1115, #0a0c0f 70%);
-    font-family: system-ui, -apple-system, Inter, Segoe UI, Roboto, Arial, sans-serif;
-    color:#cfd3d8; overflow:hidden; display:grid; place-items:center;
-  }
-  #app{width:100%;height:100%;display:grid;place-items:center}
-  .hint{
-    position:fixed; bottom:14px; left:50%; transform:translateX(-50%);
-    font-size:12px; letter-spacing:.3px; opacity:.6; user-select:none
-  }
+  body{margin:0;height:100vh;display:grid;place-items:center;
+       background:radial-gradient(circle at center,#0c0d0f,#1a1c20 80%)}
+  canvas{display:block}
 </style>
 </head>
 <body>
-  <div id="app"></div>
-  <div class="hint">Carte 3D — recto/verso gravés (tourne automatiquement)</div>
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(35, innerWidth/innerHeight, 0.1, 2000);
+camera.position.set(0,40,500);
 
-  <!-- Three.js depuis CDN -->
-  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-  <script>
-  (()=>{
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setSize(innerWidth,innerHeight);
+document.body.appendChild(renderer.domElement);
 
-    // ——————————————————————————
-    // Scène / Caméra / Rendu
-    // ——————————————————————————
-    const W = 440, H = 260, DEPTH = 64; // mm visuels
-    const container = document.getElementById('app');
+// lumières
+scene.add(new THREE.AmbientLight(0xffffff,0.6));
+const light = new THREE.DirectionalLight(0xffffff,1.2);
+light.position.set(2,3,4);
+scene.add(light);
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 2000);
-    camera.position.set(0, 70, 680);
+// dimensions carte type bancaire
+const W=430, H=270, D=6; // D=épaisseur ~ 3mm à l’échelle
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    container.appendChild(renderer.domElement);
+// matériaux
+function makeFace(textLines,bgA="#1b1e23",bgB="#0f1114"){
+  const canvas=document.createElement("canvas");
+  canvas.width=1024;canvas.height=640;
+  const g=canvas.getContext("2d");
+  const grad=g.createLinearGradient(0,0,1024,640);
+  grad.addColorStop(0,bgA);grad.addColorStop(1,bgB);
+  g.fillStyle=grad;g.fillRect(0,0,1024,640);
 
-    // ——————————————————————————
-    // Lumières (métal réaliste)
-    // ——————————————————————————
-    scene.add(new THREE.AmbientLight(0xffffff, 0.45));
-    const dir1 = new THREE.DirectionalLight(0xffffff, 1.1);
-    dir1.position.set(2, 3, 4);
-    scene.add(dir1);
-    const dir2 = new THREE.DirectionalLight(0xffffff, 0.6);
-    dir2.position.set(-3, 2, -4);
-    scene.add(dir2);
+  g.fillStyle="#cfd3d8";
+  g.textAlign="center";g.textBaseline="middle";
+  textLines.forEach((L,i)=>{
+    g.font=L.font;
+    g.shadowColor="rgba(0,0,0,0.8)";
+    g.shadowOffsetX=2;g.shadowOffsetY=2;
+    g.fillText(L.text,512,300+L.y);
+  });
+  const tex=new THREE.CanvasTexture(canvas);
+  tex.colorSpace=THREE.SRGBColorSpace;
+  return new THREE.MeshStandardMaterial({map:tex,metalness:0.9,roughness:0.35});
+}
 
-    // ——————————————————————————
-    // Génération textures métal + gravure
-    // ——————————————————————————
-    function metalTexture(w, h, darkA = '#1b1e23', darkB = '#0f1114'){
-      const c = document.createElement('canvas');
-      c.width = w; c.height = h;
-      const g = c.getContext('2d');
+// recto & verso
+const frontMat=makeFace([
+  {text:"Raphaël Guiller",font:"700 72px Georgia",y:-40},
+  {text:"PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.",font:"700 26px Inter",y:40}
+]);
+const backMat=makeFace([
+  {text:"07 64 02 12 68",font:"700 40px Inter",y:-50},
+  {text:"rg.businesscard@gmail.com",font:"700 34px Inter",y:0},
+  {text:"instagram.com/rg.card",font:"700 34px Inter",y:50}
+], "#171a1f","#0b0c0e");
 
-      // fond dégradé
-      const grd = g.createLinearGradient(0,0,w,h);
-      grd.addColorStop(0, darkA);
-      grd.addColorStop(1, darkB);
-      g.fillStyle = grd; g.fillRect(0,0,w,h);
+// côtés
+const sideMat=new THREE.MeshStandardMaterial({color:0x111317,metalness:1,roughness:0.5});
 
-      // stries brossées
-      g.globalAlpha = 0.06;
-      for(let x=0;x<w;x+=4){
-        g.fillStyle = '#ffffff';
-        g.fillRect(x,0,2,h);
-      }
-      // micro grain
-      g.globalAlpha = 0.05;
-      for(let i=0;i<Math.floor(w*h/400);i++){
-        const x = Math.random()*w, y=Math.random()*h;
-        g.fillStyle = Math.random()>0.5 ? '#fff' : '#000';
-        g.fillRect(x,y,1,1);
-      }
+// géométrie fine (carte)
+const geo=new THREE.BoxGeometry(W,H,D);
+const mats=[sideMat,sideMat,sideMat,sideMat,frontMat,backMat];
+const card=new THREE.Mesh(geo,mats);
+scene.add(card);
 
-      const tex = new THREE.CanvasTexture(c);
-      tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.anisotropy = 8;
-      tex.colorSpace = THREE.SRGBColorSpace;
-      return tex;
-    }
+// anim
+function animate(){
+  requestAnimationFrame(animate);
+  card.rotation.y+=0.01;
+  renderer.render(scene,camera);
+}
+animate();
 
-    function textBumpMap(w, h, lines, opts={}){
-      // bumpMap: gris clair = haut, sombre = creux → texte sombre pour "gravé"
-      const base = opts.baseGray ?? 230; // fond clair
-      const textDark = opts.textDark ?? 60; // texte foncé (creusé)
-      const c = document.createElement('canvas'); c.width=w; c.height=h;
-      const g = c.getContext('2d');
-
-      // fond
-      g.fillStyle = `rgb(${base},${base},${base})`;
-      g.fillRect(0,0,w,h);
-
-      // style texte
-      g.textAlign = 'center';
-      g.textBaseline = 'middle';
-      g.fillStyle = `rgb(${textDark},${textDark},${textDark})`;
-
-      // effet biseau peint (renforce la perception d'incision)
-      function bevelText(txt, x, y, font, spacing=0){
-        g.font = font;
-        // highlight haut-gauche
-        g.shadowColor = 'rgba(255,255,255,0.55)';
-        g.shadowBlur = 0; g.shadowOffsetX = -1; g.shadowOffsetY = -1;
-        g.fillText(txt, x, y+spacing);
-        // ombre bas-droite
-        g.shadowColor = 'rgba(0,0,0,0.85)';
-        g.shadowOffsetX = 1.2; g.shadowOffsetY = 1.6;
-        g.fillText(txt, x, y+spacing);
-        // couche sombre pour creuser
-        g.shadowColor = 'transparent';
-        g.fillText(txt, x, y+spacing);
-      }
-
-      // disposition lignes
-      const cy = h/2;
-      for(const L of lines){
-        bevelText(L.text, w/2, cy + L.y, L.font);
-      }
-
-      const tex = new THREE.CanvasTexture(c);
-      tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
-      tex.anisotropy = 8;
-      return tex;
-    }
-
-    // RECTO : Nom + slogan (gravure)
-    const frontColor = metalTexture(1024, 600, '#1b1e23', '#0f1114');
-    const frontBump  = textBumpMap(1024, 600, [
-      { text: 'Raphaël Guiller', font: '700 92px Georgia, Times New Roman, serif', y: -70 },
-      { text: 'PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.', font: '700 34px Inter, system-ui, sans-serif', y: +40 }
-    ], { baseGray: 235, textDark: 70 });
-
-    // VERSO : Coordonnées (gravure)
-    const backColor = metalTexture(1024, 600, '#171a1f', '#0b0c0e');
-    const backBump  = textBumpMap(1024, 600, [
-      { text: '07 64 02 12 68',           font: '700 48px Inter, system-ui, sans-serif', y: -60 },
-      { text: 'rg.businesscard@gmail.com',font: '700 44px Inter, system-ui, sans-serif', y:   0 },
-      { text: 'instagram.com/rg.card',    font: '700 44px Inter, system-ui, sans-serif', y: +60 }
-    ], { baseGray: 235, textDark: 70 });
-
-    // Matériaux
-    function metalMaterial(map, bump){
-      const m = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        metalness: 1.0,
-        roughness: 0.35,
-        map: map,
-        bumpMap: bump,
-        bumpScale: -0.6, // <0 = gravure (creusé)
-        envMapIntensity: 1.0
-      });
-      return m;
-    }
-    const matFront = metalMaterial(frontColor, frontBump);
-    const matBack  = metalMaterial(backColor,  backBump);
-
-    // Côtés (tranche métal sombre)
-    const sideMap = metalTexture(1024, 256, '#0e1012', '#1c1f24');
-    const matSide = new THREE.MeshStandardMaterial({
-      color: 0xffffff, metalness: 1.0, roughness: 0.45, map: sideMap
-    });
-
-    // ——————————————————————————
-    // Géométrie de carte (boîte) + matériaux par face
-    // Ordre Three.js Box: +x, -x, +y, -y, +z, -z  =>  sides, front(pz), back(nz)
-    // ——————————————————————————
-    const geo = new THREE.BoxGeometry(W, H, DEPTH);
-    const materials = [ matSide, matSide, matSide, matSide, matFront, matBack ];
-    const card = new THREE.Mesh(geo, materials);
-    scene.add(card);
-
-    // ——————————————————————————
-    // Animation (rotation continue)
-    // ——————————————————————————
-    let t = 0;
-    function animate(){
-      t += 0.01;
-      card.rotation.y = t;
-      // légère oscillation pour réalisme
-      card.rotation.x = Math.sin(t*0.35)*0.06;
-      renderer.render(scene, camera);
-      requestAnimationFrame(animate);
-    }
-    animate();
-
-    // ——————————————————————————
-    // Resize
-    // ——————————————————————————
-    window.addEventListener('resize', ()=>{
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-  })();
-  </script>
+// resize
+addEventListener("resize",()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>
 </body>
 </html>
