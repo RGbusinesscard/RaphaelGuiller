@@ -2,12 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Raphaël Guiller — RG.card</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@600&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Scène */
     --bg1:#0b0c0e; --bg2:#14161a; --bg3:#1c2026;
 
     /* Métal */
@@ -17,10 +16,10 @@
     --steel-side1:#0e1012; --steel-side2:#1c1f24;
 
     /* Géométrie de la carte */
-    --W: 380px;      /* largeur  */
-    --H: 240px;      /* hauteur  */
-    --D: 42px;       /* ÉPAISSEUR (visiblement plus épais) */
-    --R: 18px;       /* arrondi  */
+    --W: 380px;
+    --H: 240px;
+    --D: 40px;    /* épaisseur visible */
+    --R: 18px;
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
@@ -28,17 +27,15 @@
     min-height:100vh; display:grid; place-items:center;
     background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));
     background-size:400% 400%; animation:bgShift 18s ease infinite;
+    color:#cfd3d8; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   }
   @keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
-  /* Scène 3D */
   .scene{ width:var(--W); height:var(--H); perspective:1400px; }
 
-  /* Carte avec VRAIE épaisseur (faces + côtés) */
   .card{
     width:var(--W); height:var(--H); position:relative;
-    transform-style:preserve-3d;
-    animation:spin 14s linear infinite;
+    transform-style:preserve-3d; animation:spin 14s linear infinite;
     filter: drop-shadow(0 22px 42px rgba(0,0,0,.65)) drop-shadow(0 8px 20px rgba(0,0,0,.55));
   }
   @keyframes spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
@@ -47,7 +44,8 @@
     position:absolute; inset:0; border-radius:var(--R);
     backface-visibility:hidden; overflow:hidden;
   }
-  /* Avant (métal brossé + stries) */
+
+  /* Avant (métal brossé) */
   .front{
     transform:translateZ(calc(var(--D)/2));
     background:
@@ -56,11 +54,12 @@
     box-shadow:inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.55);
   }
   .front::after{
-    /* reflet spéculaire subtil qui glisse */
     content:""; position:absolute; inset:-40% -10%; border-radius:inherit; pointer-events:none;
     background:conic-gradient(from 200deg at 30% 10%, rgba(255,255,255,.18), transparent 25% 60%, rgba(255,255,255,.12) 75%, transparent);
     filter:blur(18px); opacity:.33; mix-blend-mode:screen; animation:spec 12s ease-in-out infinite;
   }
+  @keyframes spec{50%{transform:translate(12%,6%) rotate(6deg)}}
+
   /* Arrière */
   .back{
     transform:rotateY(180deg) translateZ(calc(var(--D)/2));
@@ -69,35 +68,24 @@
       repeating-linear-gradient(90deg,var(--steel-lines1) 0px,var(--steel-lines1) 2px,var(--steel-lines2) 3px,var(--steel-lines2) 4px);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 -1px 0 rgba(0,0,0,.55);
   }
-  @keyframes spec{50%{transform:translate(12%,6%) rotate(6deg)}}
 
-  /* CÔTÉS (on voit le relief à 90°) */
+  /* CÔTÉS (épaisseur réelle) */
   .side{ position:absolute; background:linear-gradient(180deg,var(--steel-side1),var(--steel-side2)); }
   .left{   width:var(--D); height:100%; left:calc(-1*var(--D)/2);   transform:rotateY(-90deg) translateZ(calc(var(--W)/2)); }
   .right{  width:var(--D); height:100%; right:calc(-1*var(--D)/2);  transform:rotateY( 90deg) translateZ(calc(var(--W)/2)); }
   .top{    width:100%; height:var(--D); top:calc(-1*var(--D)/2);    transform:rotateX( 90deg) translateZ(calc(var(--H)/2)); }
   .bottom{ width:100%; height:var(--D); bottom:calc(-1*var(--D)/2); transform:rotateX(-90deg) translateZ(calc(var(--H)/2)); }
 
-  /* Chanfrein (liseré) pour accentuer la bordure */
-  .rim{
-    position:absolute; inset:0; border-radius:var(--R); pointer-events:none;
-    background:linear-gradient(145deg, #ffffff0a 20%, #00000066 80%);
-    mix-blend-mode:overlay;
-  }
+  /* Chanfrein/liseré subtil */
+  .rim{ position:absolute; inset:0; border-radius:var(--R); pointer-events:none;
+        background:linear-gradient(145deg,#ffffff12 20%,#00000066 80%); mix-blend-mode:overlay; }
 
-  /* Contenu centré sur chaque face */
+  /* Contenu centré */
   .pad{ position:absolute; inset:0; display:grid; place-items:center; padding:18px; }
 
-  /* Texte gravé : filtre SVG appliqué dans chaque <svg> */
+  /* Styles textes */
   .t1{ font-family:"Playfair Display",serif; font-weight:600; }
-  .t2{ font-family:"Inter",sans-serif;    font-weight:600; letter-spacing:1px; }
-
-  /* Couleur acier du lettrage (avant/après filtre) */
-  .steelFill stop:first-child{ stop-color:#cfd3d8 }
-  .steelFill stop:last-child{  stop-color:#9aa2a8 }
-
-  /* Texte arrière (un peu plus grand et bien espacé) */
-  .back svg text{ font-size:28px }
+  .t2{ font-family:"Inter",sans-serif; font-weight:600; letter-spacing:1px; }
 </style>
 </head>
 <body>
@@ -109,23 +97,40 @@
         <div class="pad">
           <svg viewBox="0 0 900 220" width="88%" xmlns="http://www.w3.org/2000/svg" aria-label="Raphaël Guiller — RG.card">
             <defs>
-              <!-- Filtre gravure profonde -->
-              <filter id="engraveFront" x="-50%" y="-50%" width="200%" height="200%">
-                <!-- ombre interne (bas/droite) -->
+              <!-- Gravure profonde (ombre interne + highlight) -->
+              <filter id="engraveDeep" x="-50%" y="-50%" width="200%" height="200%">
+                <!-- Ombre interne -->
                 <feOffset in="SourceAlpha" dx="1.4" dy="1.8" result="off1"/>
                 <feGaussianBlur in="off1" stdDeviation="1.4" result="blur1"/>
                 <feComposite in="blur1" in2="SourceAlpha" operator="out" result="inner1"/>
-                <feColorMatrix in="inner1" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .95 0" result="dark"/>
-                <!-- highlight interne (haut/gauche) -->
+                <feColorMatrix in="inner1" type="matrix"
+                  values="0 0 0 0 0
+                          0 0 0 0 0
+                          0 0 0 0 0
+                          0 0 0 .95 0" result="dark"/>
+                <!-- Highlight interne -->
                 <feOffset in="SourceAlpha" dx="-1.2" dy="-1.2" result="off2"/>
                 <feGaussianBlur in="off2" stdDeviation="1.2" result="blur2"/>
                 <feComposite in="blur2" in2="SourceAlpha" operator="out" result="inner2"/>
-                <feColorMatrix in="inner2" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0" result="light"/>
-                <feMerge><feMergeNode in="dark"/><feMergeNode in="light"/><feMergeNode in="SourceGraphic"/></feMerge>
+                <feColorMatrix in="inner2" type="matrix"
+                  values="0 0 0 0 1
+                          0 0 0 0 1
+                          0 0 0 0 1
+                          0 0 0 .55 0" result="light"/>
+                <feMerge>
+                  <feMergeNode in="dark"/>
+                  <feMergeNode in="light"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
               </filter>
-              <linearGradient id="steelTextFront" class="steelFill" x1="0" x2="0" y1="0" y2="1"/>
+              <!-- Remplissage acier (pas de CSS externe: stops inline) -->
+              <linearGradient id="steelText" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%"  stop-color="#cfd3d8"/>
+                <stop offset="100%" stop-color="#9aa2a8"/>
+              </linearGradient>
             </defs>
-            <g filter="url(#engraveFront)" fill="url(#steelTextFront)">
+
+            <g filter="url(#engraveDeep)" fill="url(#steelText)" stroke="#ffffff22" stroke-width="0.6">
               <text class="t1" x="0" y="84" font-size="60">Raphaël Guiller</text>
               <text class="t2" x="0" y="150" font-size="26">PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.</text>
             </g>
@@ -133,35 +138,51 @@
         </div>
       </div>
 
-      <!-- FACE ARRIÈRE (numéro, email, Instagram — TOUS GRAVÉS) -->
+      <!-- FACE ARRIÈRE : numéro, email, Instagram (gravure aussi) -->
       <div class="face back">
         <div class="rim"></div>
         <div class="pad">
           <svg viewBox="0 0 900 220" width="88%" xmlns="http://www.w3.org/2000/svg" aria-label="Contacts">
             <defs>
-              <filter id="engraveBack" x="-50%" y="-50%" width="200%" height="200%">
+              <filter id="engraveDeepBack" x="-50%" y="-50%" width="200%" height="200%">
                 <feOffset in="SourceAlpha" dx="1.4" dy="1.8" result="off1"/>
                 <feGaussianBlur in="off1" stdDeviation="1.4" result="blur1"/>
                 <feComposite in="blur1" in2="SourceAlpha" operator="out" result="inner1"/>
-                <feColorMatrix in="inner1" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .95 0" result="dark"/>
+                <feColorMatrix in="inner1" type="matrix"
+                  values="0 0 0 0 0
+                          0 0 0 0 0
+                          0 0 0 0 0
+                          0 0 0 .95 0" result="dark"/>
                 <feOffset in="SourceAlpha" dx="-1.2" dy="-1.2" result="off2"/>
                 <feGaussianBlur in="off2" stdDeviation="1.2" result="blur2"/>
                 <feComposite in="blur2" in2="SourceAlpha" operator="out" result="inner2"/>
-                <feColorMatrix in="inner2" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0" result="light"/>
-                <feMerge><feMergeNode in="dark"/><feMergeNode in="light"/><feMergeNode in="SourceGraphic"/></feMerge>
+                <feColorMatrix in="inner2" type="matrix"
+                  values="0 0 0 0 1
+                          0 0 0 0 1
+                          0 0 0 0 1
+                          0 0 0 .55 0" result="light"/>
+                <feMerge>
+                  <feMergeNode in="dark"/>
+                  <feMergeNode in="light"/>
+                  <feMergeNode in="SourceGraphic"/>
+                </feMerge>
               </filter>
-              <linearGradient id="steelTextBack" class="steelFill" x1="0" x2="0" y1="0" y2="1"/>
+              <linearGradient id="steelTextBack" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%"  stop-color="#cfd3d8"/>
+                <stop offset="100%" stop-color="#9aa2a8"/>
+              </linearGradient>
             </defs>
-            <g filter="url(#engraveBack)" fill="url(#steelTextBack)">
-              <text class="t2" x="0" y="84">07 64 02 12 68</text>
-              <text class="t2" x="0" y="132">rg.businesscard@gmail.com</text>
-              <text class="t2" x="0" y="180">instagram.com/rg.card</text>
+
+            <g filter="url(#engraveDeepBack)" fill="url(#steelTextBack)" stroke="#ffffff22" stroke-width="0.6">
+              <text class="t2" x="0" y="84"  font-size="28">07 64 02 12 68</text>
+              <text class="t2" x="0" y="132" font-size="28">rg.businesscard@gmail.com</text>
+              <text class="t2" x="0" y="180" font-size="28">instagram.com/rg.card</text>
             </g>
           </svg>
         </div>
       </div>
 
-      <!-- CÔTÉS (épaisseur visible) -->
+      <!-- CÔTÉS (épaisseur) -->
       <div class="side left"></div>
       <div class="side right"></div>
       <div class="side top"></div>
