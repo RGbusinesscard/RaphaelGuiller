@@ -3,179 +3,101 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Raphaël Guiller — RG.card (3D métal)</title>
-<meta http-equiv="Cache-Control" content="no-store" />
+<title>Raphaël Guiller — RG.card</title>
 <style>
   :root{
-    /* TAILLE & ÉPAISSEUR BIEN VISIBLES */
-    --W: 440px;   /* largeur */
-    --H: 260px;   /* hauteur */
-    --D: 64px;    /* ÉPAISSEUR claire */
-    --R: 18px;    /* rayon des coins */
-
-    /* Métal sombre */
-    --steel1:#1b1e23; --steel2:#0f1114; --steel3:#171a1f; --steel4:#0b0c0e;
+    --W: 440px;   /* largeur carte */
+    --H: 260px;   /* hauteur carte */
+    --D: 64px;    /* épaisseur */
+    --R: 18px;    /* arrondi */
+    /* Couleurs métal */
+    --steel1:#1b1e23; --steel2:#0f1114;
+    --steel3:#171a1f; --steel4:#0b0c0e;
     --side1:#0e1012;  --side2:#1c1f24;
-
-    --ink:#cfd3d8;
+    --ink:#cfd3d8;    /* couleur acier clair */
   }
 
   *{box-sizing:border-box;margin:0;padding:0}
   body{
     min-height:100vh; display:grid; place-items:center;
-    background:radial-gradient(1200px 800px at 50% 60%,#0e1115,#0a0b0d 70%);
+    background:radial-gradient(circle at center,#0b0c0e,#14161a 70%);
     color:var(--ink);
     font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial,sans-serif;
   }
 
-  /* SCÈNE 3D */
-  .scene{
-    width:calc(var(--W) + 200px);
-    height:calc(var(--H) + 200px);
-    display:grid; place-items:center;
-    perspective:1400px; -webkit-perspective:1400px;
-  }
+  .scene{ perspective:1400px; }
 
-  /* CONTENEUR DE LA CARTE (6 faces) */
-  .card3d{
+  .card{
     position:relative; width:var(--W); height:var(--H);
-    transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
-    animation:spin 12s linear infinite;
-    filter: drop-shadow(0 26px 52px rgba(0,0,0,.65)) drop-shadow(0 12px 24px rgba(0,0,0,.55));
-    will-change: transform;
+    transform-style:preserve-3d;
+    animation:spin 14s linear infinite;
+    filter: drop-shadow(0 24px 48px rgba(0,0,0,.7));
   }
   @keyframes spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
 
-  /* FACE GÉNÉRIQUE */
   .face{
-    position:absolute; left:0; top:0; width:var(--W); height:var(--H);
+    position:absolute; width:var(--W); height:var(--H);
     border-radius:var(--R);
-    overflow:hidden;
     backface-visibility:hidden; -webkit-backface-visibility:hidden;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
   }
 
-  /* RECTO & VERSO : métal brossé + reflet glissant */
-  .metal-front{
-    background:
-      linear-gradient(155deg,var(--steel1) 0%,var(--steel2) 65%, var(--steel4) 100%),
-      repeating-linear-gradient(90deg,#1a1d22 0px,#1a1d22 2px,#16191d 3px,#16191d 4px);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.55);
+  /* Recto & verso métal brossé */
+  .front{
+    background:linear-gradient(155deg,var(--steel1),var(--steel2));
+    transform:translateZ(calc(var(--D)/2));
   }
-  .metal-back{
-    background:
-      linear-gradient(155deg,var(--steel3) 0%,var(--steel2) 65%, var(--steel4) 100%),
-      repeating-linear-gradient(90deg,#1a1d22 0px,#1a1d22 2px,#16191d 3px,#16191d 4px);
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 -1px 0 rgba(0,0,0,.55);
+  .back{
+    background:linear-gradient(155deg,var(--steel3),var(--steel4));
+    transform:rotateY(180deg) translateZ(calc(var(--D)/2));
   }
-  .spec::after{
-    content:""; position:absolute; inset:-50% -12%; border-radius:inherit; pointer-events:none;
-    background:conic-gradient(from 200deg at 30% 10%, rgba(255,255,255,.18), transparent 25% 60%, rgba(255,255,255,.12) 75%, transparent);
-    filter:blur(18px); opacity:.34; mix-blend-mode:screen; animation:spec 12s ease-in-out infinite;
-  }
-  @keyframes spec{50%{transform:translate(12%,6%) rotate(6deg)}}
 
-  /* POSITION 3D DES FACES (IMPORTANT: translateZ en pixels simples) */
-  .front{ transform: translateZ(32px); }   /* 32px = --D/2 */
-  .back { transform: rotateY(180deg) translateZ(32px); }
+  /* Épaisseur : 4 côtés */
+  .side{position:absolute;left:50%;top:50%;background:linear-gradient(180deg,var(--side1),var(--side2))}
+  .right,.left{width:var(--D);height:var(--H)}
+  .top,.bottom{width:var(--W);height:var(--D)}
+  .right {transform:translate(-50%,-50%) rotateY(90deg)  translateZ(calc(var(--W)/2))}
+  .left  {transform:translate(-50%,-50%) rotateY(-90deg) translateZ(calc(var(--W)/2))}
+  .top   {transform:translate(-50%,-50%) rotateX(90deg)  translateZ(calc(var(--H)/2))}
+  .bottom{transform:translate(-50%,-50%) rotateX(-90deg) translateZ(calc(var(--H)/2))}
 
-  /* CÔTÉS : centrés puis envoyés avec translateZ —> ils restent collés */
-  .side{
-    position:absolute; left:50%; top:50%;
-    background:linear-gradient(180deg,var(--side1),var(--side2));
-    transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
-  }
-  .right, .left{ width:var(--D); height:var(--H); }
-  .top, .bottom{ width:var(--W); height:var(--D); }
-
-  .right { transform: translate(-50%,-50%) rotateY( 90deg) translateZ(calc(var(--W)/2)); }
-  .left  { transform: translate(-50%,-50%) rotateY(-90deg) translateZ(calc(var(--W)/2)); }
-  .top   { transform: translate(-50%,-50%) rotateX( 90deg) translateZ(calc(var(--H)/2)); border-radius:10px; }
-  .bottom{ transform: translate(-50%,-50%) rotateX(-90deg) translateZ(calc(var(--H)/2)); border-radius:10px; }
-
-  /* Liseré/chanfrein qui accroche la lumière (recouvre les petites jonctions) */
-  .rim{ position:absolute; inset:0; border-radius:var(--R); pointer-events:none;
-        background:linear-gradient(145deg,#ffffff18 20%,#00000066 80%); mix-blend-mode:overlay; }
-
-  /* CONTENU INTERNE CENTRÉ */
-  .pad{ position:absolute; inset:0; display:grid; place-items:center; padding:24px; text-align:center; }
-
-  /* GRAVURE RÉALISTE (fallback CSS : multi text-shadow) */
+  /* Gravure réaliste */
   .engrave{
     color:var(--ink);
     text-shadow:
-      0 2px 2px rgba(0,0,0,.96),         /* ombre interne basse */
-      0 -1.6px 1.3px rgba(255,255,255,.40), /* highlight haut */
-      1.4px 0 1.3px rgba(0,0,0,.68),     /* ombre droite */
-     -1.2px 0 1.1px rgba(255,255,255,.28); /* highlight gauche */
-    letter-spacing:.4px;
+      0 2px 2px rgba(0,0,0,.95),
+      0 -1.6px 1.2px rgba(255,255,255,.4),
+      1.4px 0 1.3px rgba(0,0,0,.65),
+     -1.2px 0 1.1px rgba(255,255,255,.3);
+    text-align:center;
+    letter-spacing:.5px;
   }
-  .name{ font-family: "Georgia","Times New Roman",serif; font-weight:700; font-size:44px; margin-bottom:10px }
-  .tag { font-family: "Inter",sans-serif;   font-weight:700; font-size:18px }
-  .line{ font-family: "Inter",sans-serif;   font-weight:700; font-size:22px; line-height:1.6 }
-
-  @media (max-width:520px){
-    :root{ --W: 360px; --H: 220px; --D: 56px; }
-    .name{ font-size:36px } .tag{ font-size:16px } .line{ font-size:19px }
-    .front{ transform: translateZ(28px); } .back{ transform: rotateY(180deg) translateZ(28px); }
-  }
+  .name{font:700 44px "Georgia","Times New Roman",serif;margin-bottom:10px}
+  .tag {font:700 18px "Inter",sans-serif}
+  .line{font:700 22px "Inter",sans-serif;margin:6px 0}
 </style>
 </head>
 <body>
   <div class="scene">
-    <div class="card3d" aria-label="Carte métal 3D qui tourne">
-      <!-- RECTO -->
-      <div class="face front metal-front spec">
-        <div class="rim"></div>
-        <div class="pad">
-          <div class="engrave name">Raphaël Guiller</div>
-          <div class="engrave tag">PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.</div>
-        </div>
+    <div class="card">
+      <!-- Recto -->
+      <div class="face front">
+        <div class="engrave name">Raphaël Guiller</div>
+        <div class="engrave tag">PAS D’APPLI. PAS DE STRESS.<br>IL SUFFIT DE PASSER.</div>
       </div>
-
-      <!-- VERSO -->
-      <div class="face back metal-back spec" aria-label="Verso : contacts gravés">
-        <div class="rim"></div>
-        <div class="pad">
-          <div class="engrave line">07 64 02 12 68</div>
-          <div class="engrave line">rg.businesscard@gmail.com</div>
-          <div class="engrave line">instagram.com/rg.card</div>
-        </div>
+      <!-- Verso -->
+      <div class="face back">
+        <div class="engrave line">07 64 02 12 68</div>
+        <div class="engrave line">rg.businesscard@gmail.com</div>
+        <div class="engrave line">instagram.com/rg.card</div>
       </div>
-
-      <!-- ÉPAISSEUR (4 côtés solidaires) -->
+      <!-- Épaisseur -->
       <div class="side right"></div>
       <div class="side left"></div>
       <div class="side top"></div>
       <div class="side bottom"></div>
     </div>
   </div>
-
-  <!-- FILTRE SVG (si supporté, on booste la gravure automatiquement) -->
-  <svg width="0" height="0" style="position:absolute">
-    <defs>
-      <filter id="engraveFilter" x="-50%" y="-50%" width="200%" height="200%">
-        <feOffset in="SourceAlpha" dx="1.6" dy="2.0" result="off1"/>
-        <feGaussianBlur in="off1" stdDeviation="1.4" result="blur1"/>
-        <feComposite in="blur1" in2="SourceAlpha" operator="out" result="inner1"/>
-        <feColorMatrix in="inner1" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .95 0" result="dark"/>
-        <feOffset in="SourceAlpha" dx="-1.3" dy="-1.3" result="off2"/>
-        <feGaussianBlur in="off2" stdDeviation="1.1" result="blur2"/>
-        <feComposite in="blur2" in2="SourceAlpha" operator="out" result="inner2"/>
-        <feColorMatrix in="inner2" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0" result="light"/>
-        <feMerge><feMergeNode in="dark"/><feMergeNode in="light"/><feMergeNode in="SourceGraphic"/></feMerge>
-      </filter>
-    </defs>
-  </svg>
-  <script>
-    // Sur navigateurs compatibles, applique le vrai filtre de gravure (plus net que le text-shadow)
-    try{
-      if (CSS && CSS.supports && CSS.supports('filter', 'url("#engraveFilter")')){
-        document.querySelectorAll('.engrave').forEach(el=>{
-          el.style.filter = 'url(#engraveFilter)';
-          el.style.textShadow = 'none';
-        });
-      }
-    }catch(e){}
-  </script>
 </body>
 </html>
