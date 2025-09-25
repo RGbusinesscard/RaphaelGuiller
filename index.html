@@ -5,87 +5,92 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Carte 3D Raphaël Guiller</title>
 <style>
-  body{margin:0;height:100vh;display:grid;place-items:center;
-       background:radial-gradient(circle at center,#0c0d0f,#1a1c20 80%)}
-  canvas{display:block}
+  :root{
+    --W: 340px;   /* largeur carte réaliste */
+    --H: 210px;   /* hauteur carte réaliste */
+    --D: 8px;     /* épaisseur fine */
+    --R: 20px;    /* arrondi bords */
+    --ink:#cfd3d8;
+    --steelFront:#1b1e23;
+    --steelBack:#171a1f;
+    --side:#111317;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    min-height:100vh;display:grid;place-items:center;
+    background:radial-gradient(circle at center,#0b0c0e,#14161a 70%);
+    font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial,sans-serif;
+    color:var(--ink);
+  }
+
+  .scene{perspective:1200px}
+  .card{
+    position:relative;width:var(--W);height:var(--H);
+    transform-style:preserve-3d;
+    animation:spin 10s linear infinite;
+    filter:drop-shadow(0 16px 32px rgba(0,0,0,.6));
+  }
+  @keyframes spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+
+  .face{
+    position:absolute;width:var(--W);height:var(--H);
+    border-radius:var(--R);
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+  }
+  .front{
+    background:linear-gradient(155deg,var(--steelFront),#0f1114);
+    transform:translateZ(calc(var(--D)/2));
+  }
+  .back{
+    background:linear-gradient(155deg,var(--steelBack),#0b0c0e);
+    transform:rotateY(180deg) translateZ(calc(var(--D)/2));
+  }
+
+  /* côtés fins */
+  .side{position:absolute;left:50%;top:50%;background:var(--side)}
+  .right,.left{width:var(--D);height:var(--H)}
+  .top,.bottom{width:var(--W);height:var(--D)}
+  .right {transform:translate(-50%,-50%) rotateY(90deg) translateZ(calc(var(--W)/2))}
+  .left  {transform:translate(-50%,-50%) rotateY(-90deg) translateZ(calc(var(--W)/2))}
+  .top   {transform:translate(-50%,-50%) rotateX(90deg) translateZ(calc(var(--H)/2))}
+  .bottom{transform:translate(-50%,-50%) rotateX(-90deg) translateZ(calc(var(--H)/2))}
+
+  /* Gravure */
+  .engrave{
+    color:var(--ink);
+    text-shadow:
+      0 1.5px 1.5px rgba(0,0,0,.95),
+      0 -1.2px 1px rgba(255,255,255,.4),
+      1px 0 1px rgba(0,0,0,.65),
+     -1px 0 1px rgba(255,255,255,.3);
+    text-align:center;
+  }
+  .name{font:700 28px "Georgia","Times New Roman",serif;margin-bottom:8px}
+  .tag {font:700 13px "Inter",sans-serif}
+  .line{font:700 16px "Inter",sans-serif;margin:4px 0}
 </style>
 </head>
 <body>
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
-<script>
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(35, innerWidth/innerHeight, 0.1, 2000);
-camera.position.set(0,40,500);
-
-const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
-renderer.setSize(innerWidth,innerHeight);
-document.body.appendChild(renderer.domElement);
-
-// lumières
-scene.add(new THREE.AmbientLight(0xffffff,0.6));
-const light = new THREE.DirectionalLight(0xffffff,1.2);
-light.position.set(2,3,4);
-scene.add(light);
-
-// dimensions carte type bancaire
-const W=430, H=270, D=6; // D=épaisseur ~ 3mm à l’échelle
-
-// matériaux
-function makeFace(textLines,bgA="#1b1e23",bgB="#0f1114"){
-  const canvas=document.createElement("canvas");
-  canvas.width=1024;canvas.height=640;
-  const g=canvas.getContext("2d");
-  const grad=g.createLinearGradient(0,0,1024,640);
-  grad.addColorStop(0,bgA);grad.addColorStop(1,bgB);
-  g.fillStyle=grad;g.fillRect(0,0,1024,640);
-
-  g.fillStyle="#cfd3d8";
-  g.textAlign="center";g.textBaseline="middle";
-  textLines.forEach((L,i)=>{
-    g.font=L.font;
-    g.shadowColor="rgba(0,0,0,0.8)";
-    g.shadowOffsetX=2;g.shadowOffsetY=2;
-    g.fillText(L.text,512,300+L.y);
-  });
-  const tex=new THREE.CanvasTexture(canvas);
-  tex.colorSpace=THREE.SRGBColorSpace;
-  return new THREE.MeshStandardMaterial({map:tex,metalness:0.9,roughness:0.35});
-}
-
-// recto & verso
-const frontMat=makeFace([
-  {text:"Raphaël Guiller",font:"700 72px Georgia",y:-40},
-  {text:"PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.",font:"700 26px Inter",y:40}
-]);
-const backMat=makeFace([
-  {text:"07 64 02 12 68",font:"700 40px Inter",y:-50},
-  {text:"rg.businesscard@gmail.com",font:"700 34px Inter",y:0},
-  {text:"instagram.com/rg.card",font:"700 34px Inter",y:50}
-], "#171a1f","#0b0c0e");
-
-// côtés
-const sideMat=new THREE.MeshStandardMaterial({color:0x111317,metalness:1,roughness:0.5});
-
-// géométrie fine (carte)
-const geo=new THREE.BoxGeometry(W,H,D);
-const mats=[sideMat,sideMat,sideMat,sideMat,frontMat,backMat];
-const card=new THREE.Mesh(geo,mats);
-scene.add(card);
-
-// anim
-function animate(){
-  requestAnimationFrame(animate);
-  card.rotation.y+=0.01;
-  renderer.render(scene,camera);
-}
-animate();
-
-// resize
-addEventListener("resize",()=>{
-  camera.aspect=innerWidth/innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(innerWidth,innerHeight);
-});
-</script>
+  <div class="scene">
+    <div class="card">
+      <!-- Recto -->
+      <div class="face front">
+        <div class="engrave name">Raphaël Guiller</div>
+        <div class="engrave tag">PAS D’APPLI. PAS DE STRESS.<br>IL SUFFIT DE PASSER.</div>
+      </div>
+      <!-- Verso -->
+      <div class="face back">
+        <div class="engrave line">07 64 02 12 68</div>
+        <div class="engrave line">rg.businesscard@gmail.com</div>
+        <div class="engrave line">instagram.com/rg.card</div>
+      </div>
+      <!-- Épaisseur -->
+      <div class="side right"></div>
+      <div class="side left"></div>
+      <div class="side top"></div>
+      <div class="side bottom"></div>
+    </div>
+  </div>
 </body>
 </html>
