@@ -1,142 +1,169 @@
 <!doctype html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Raphaël Guiller — RG.card</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=Inter:wght@600&display=swap" rel="stylesheet">
 <style>
   :root{
     /* Scène */
     --bg1:#0b0c0e; --bg2:#14161a; --bg3:#1c2026;
-    /* Métal carte */
-    --steel-front-1:#1b1e23; --steel-front-2:#0f1114;
-    --steel-lines-1:#1a1d22; --steel-lines-2:#16191d;
-    --steel-back-1:#171a1f; --steel-back-2:#0f1113;
-    --steel-side-1:#0e1012; --steel-side-2:#1c1f24;
-    --rim-1:#2d3137; --rim-2:#0b0c0e;
-    /* Géométrie */
-    --w: 360px;  /* largeur */
-    --h: 230px;  /* hauteur */
-    --d: 28px;   /* ÉPAISSEUR */
-    --radius: 18px;
+
+    /* Métal */
+    --steel-f1:#1b1e23; --steel-f2:#0f1114;
+    --steel-b1:#171a1f; --steel-b2:#0f1113;
+    --steel-lines1:#1a1d22; --steel-lines2:#16191d;
+    --steel-side1:#0e1012; --steel-side2:#1c1f24;
+
+    /* Géométrie de la carte */
+    --W: 380px;      /* largeur  */
+    --H: 240px;      /* hauteur  */
+    --D: 42px;       /* ÉPAISSEUR (visiblement plus épais) */
+    --R: 18px;       /* arrondi  */
   }
+
   *{box-sizing:border-box;margin:0;padding:0}
   body{
-    height:100vh; display:flex; align-items:center; justify-content:center;
+    min-height:100vh; display:grid; place-items:center;
     background:linear-gradient(-45deg,var(--bg1),var(--bg2),var(--bg3));
-    background-size:400% 400%;
-    animation:bgShift 18s ease infinite;
+    background-size:400% 400%; animation:bgShift 18s ease infinite;
   }
-  @keyframes bgShift{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-  }
+  @keyframes bgShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
 
-  /* ——— Scène 3D ——— */
-  .scene{ width:var(--w); height:var(--h); perspective:1300px; }
-  .cube{
-    position:relative; width:var(--w); height:var(--h);
-    transform-style:preserve-3d; animation:spin 14s linear infinite;
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,.6)) drop-shadow(0 6px 18px rgba(0,0,0,.5));
-  }
-  @keyframes spin{ from{transform:rotateY(0deg)} to{transform:rotateY(360deg)} }
+  /* Scène 3D */
+  .scene{ width:var(--W); height:var(--H); perspective:1400px; }
 
-  /* ——— Faces ——— */
+  /* Carte avec VRAIE épaisseur (faces + côtés) */
+  .card{
+    width:var(--W); height:var(--H); position:relative;
+    transform-style:preserve-3d;
+    animation:spin 14s linear infinite;
+    filter: drop-shadow(0 22px 42px rgba(0,0,0,.65)) drop-shadow(0 8px 20px rgba(0,0,0,.55));
+  }
+  @keyframes spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+
   .face{
-    position:absolute; inset:0; border-radius:var(--radius); backface-visibility:hidden; overflow:hidden;
-    display:flex; align-items:center; justify-content:center; text-align:center;
-    padding:20px;
+    position:absolute; inset:0; border-radius:var(--R);
+    backface-visibility:hidden; overflow:hidden;
   }
+  /* Avant (métal brossé + stries) */
   .front{
-    transform: translateZ(calc(var(--d) / 2));
+    transform:translateZ(calc(var(--D)/2));
     background:
-      linear-gradient(160deg, var(--steel-front-1) 0%, var(--steel-front-2) 65%, #0b0c0e 100%),
-      repeating-linear-gradient(90deg, var(--steel-lines-1) 0px, var(--steel-lines-1) 2px, var(--steel-lines-2) 3px, var(--steel-lines-2) 4px);
+      linear-gradient(160deg,var(--steel-f1) 0%,var(--steel-f2) 65%, #0b0c0e 100%),
+      repeating-linear-gradient(90deg,var(--steel-lines1) 0px,var(--steel-lines1) 2px,var(--steel-lines2) 3px,var(--steel-lines2) 4px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06), inset 0 -1px 0 rgba(0,0,0,.55);
   }
+  .front::after{
+    /* reflet spéculaire subtil qui glisse */
+    content:""; position:absolute; inset:-40% -10%; border-radius:inherit; pointer-events:none;
+    background:conic-gradient(from 200deg at 30% 10%, rgba(255,255,255,.18), transparent 25% 60%, rgba(255,255,255,.12) 75%, transparent);
+    filter:blur(18px); opacity:.33; mix-blend-mode:screen; animation:spec 12s ease-in-out infinite;
+  }
+  /* Arrière */
   .back{
-    transform: rotateY(180deg) translateZ(calc(var(--d) / 2));
+    transform:rotateY(180deg) translateZ(calc(var(--D)/2));
     background:
-      linear-gradient(160deg, var(--steel-back-1) 0%, var(--steel-back-2) 65%, #0b0c0e 100%),
-      repeating-linear-gradient(90deg, var(--steel-lines-1) 0px, var(--steel-lines-1) 2px, var(--steel-lines-2) 3px, var(--steel-lines-2) 4px);
+      linear-gradient(160deg,var(--steel-b1) 0%,var(--steel-b2) 65%, #0b0c0e 100%),
+      repeating-linear-gradient(90deg,var(--steel-lines1) 0px,var(--steel-lines1) 2px,var(--steel-lines2) 3px,var(--steel-lines2) 4px);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05), inset 0 -1px 0 rgba(0,0,0,.55);
+  }
+  @keyframes spec{50%{transform:translate(12%,6%) rotate(6deg)}}
+
+  /* CÔTÉS (on voit le relief à 90°) */
+  .side{ position:absolute; background:linear-gradient(180deg,var(--steel-side1),var(--steel-side2)); }
+  .left{   width:var(--D); height:100%; left:calc(-1*var(--D)/2);   transform:rotateY(-90deg) translateZ(calc(var(--W)/2)); }
+  .right{  width:var(--D); height:100%; right:calc(-1*var(--D)/2);  transform:rotateY( 90deg) translateZ(calc(var(--W)/2)); }
+  .top{    width:100%; height:var(--D); top:calc(-1*var(--D)/2);    transform:rotateX( 90deg) translateZ(calc(var(--H)/2)); }
+  .bottom{ width:100%; height:var(--D); bottom:calc(-1*var(--D)/2); transform:rotateX(-90deg) translateZ(calc(var(--H)/2)); }
+
+  /* Chanfrein (liseré) pour accentuer la bordure */
+  .rim{
+    position:absolute; inset:0; border-radius:var(--R); pointer-events:none;
+    background:linear-gradient(145deg, #ffffff0a 20%, #00000066 80%);
+    mix-blend-mode:overlay;
   }
 
-  /* ——— Côtés = vraie épaisseur ——— */
-  .side{
-    position:absolute; background:linear-gradient(180deg,var(--steel-side-1),var(--steel-side-2));
-  }
-  .right{ width:var(--d); height:100%; transform: rotateY(90deg) translateZ(calc(var(--w)/2)); right:calc(-1 * var(--d)/2); }
-  .left{ width:var(--d); height:100%; transform: rotateY(-90deg) translateZ(calc(var(--w)/2)); left:calc(-1 * var(--d)/2); }
-  .top{ width:100%; height:var(--d); transform: rotateX(90deg) translateZ(calc(var(--h)/2)); top:calc(-1 * var(--d)/2); }
-  .bottom{ width:100%; height:var(--d); transform: rotateX(-90deg) translateZ(calc(var(--h)/2)); bottom:calc(-1 * var(--d)/2); }
+  /* Contenu centré sur chaque face */
+  .pad{ position:absolute; inset:0; display:grid; place-items:center; padding:18px; }
 
-  /* ——— Texte gravé ——— */
-  svg text {
-    font-family: "Playfair Display", serif;
-    fill: url(#steelText);
-    filter: url(#engrave);
-  }
-  .engrave-back text {
-    font-family: "Inter", sans-serif;
-    font-size: 28px;
-    letter-spacing: 1px;
-  }
+  /* Texte gravé : filtre SVG appliqué dans chaque <svg> */
+  .t1{ font-family:"Playfair Display",serif; font-weight:600; }
+  .t2{ font-family:"Inter",sans-serif;    font-weight:600; letter-spacing:1px; }
+
+  /* Couleur acier du lettrage (avant/après filtre) */
+  .steelFill stop:first-child{ stop-color:#cfd3d8 }
+  .steelFill stop:last-child{  stop-color:#9aa2a8 }
+
+  /* Texte arrière (un peu plus grand et bien espacé) */
+  .back svg text{ font-size:28px }
 </style>
 </head>
 <body>
   <div class="scene">
-    <div class="cube">
+    <div class="card">
       <!-- FACE AVANT -->
       <div class="face front">
-        <svg viewBox="0 0 900 220" width="90%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="engrave" x="-50%" y="-50%" width="200%" height="200%">
-              <feOffset in="SourceAlpha" dx="1.2" dy="1.6" result="off1"/>
-              <feGaussianBlur in="off1" stdDeviation="1.2" result="blur1"/>
-              <feComposite in="blur1" in2="SourceAlpha" operator="out" result="innerShadow1"/>
-              <feColorMatrix in="innerShadow1" type="matrix"
-                values="0 0 0 0 0
-                        0 0 0 0 0
-                        0 0 0 0 0
-                        0 0 0 .9 0" result="dark"/>
-              <feOffset in="SourceAlpha" dx="-1" dy="-1" result="off2"/>
-              <feGaussianBlur in="off2" stdDeviation="1" result="blur2"/>
-              <feComposite in="blur2" in2="SourceAlpha" operator="out" result="innerShadow2"/>
-              <feColorMatrix in="innerShadow2" type="matrix"
-                values="0 0 0 0 1
-                        0 0 0 0 1
-                        0 0 0 0 1
-                        0 0 0 .5 0" result="light"/>
-              <feMerge>
-                <feMergeNode in="dark"/>
-                <feMergeNode in="light"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-            <linearGradient id="steelText" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stop-color="#cfd3d8"/>
-              <stop offset="100%" stop-color="#9ba1a7"/>
-            </linearGradient>
-          </defs>
-          <text x="0" y="80" font-size="56" font-weight="600">Raphaël Guiller</text>
-          <text x="0" y="150" font-family="Inter, sans-serif" font-size="26" font-weight="600">PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.</text>
-        </svg>
+        <div class="rim"></div>
+        <div class="pad">
+          <svg viewBox="0 0 900 220" width="88%" xmlns="http://www.w3.org/2000/svg" aria-label="Raphaël Guiller — RG.card">
+            <defs>
+              <!-- Filtre gravure profonde -->
+              <filter id="engraveFront" x="-50%" y="-50%" width="200%" height="200%">
+                <!-- ombre interne (bas/droite) -->
+                <feOffset in="SourceAlpha" dx="1.4" dy="1.8" result="off1"/>
+                <feGaussianBlur in="off1" stdDeviation="1.4" result="blur1"/>
+                <feComposite in="blur1" in2="SourceAlpha" operator="out" result="inner1"/>
+                <feColorMatrix in="inner1" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .95 0" result="dark"/>
+                <!-- highlight interne (haut/gauche) -->
+                <feOffset in="SourceAlpha" dx="-1.2" dy="-1.2" result="off2"/>
+                <feGaussianBlur in="off2" stdDeviation="1.2" result="blur2"/>
+                <feComposite in="blur2" in2="SourceAlpha" operator="out" result="inner2"/>
+                <feColorMatrix in="inner2" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0" result="light"/>
+                <feMerge><feMergeNode in="dark"/><feMergeNode in="light"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <linearGradient id="steelTextFront" class="steelFill" x1="0" x2="0" y1="0" y2="1"/>
+            </defs>
+            <g filter="url(#engraveFront)" fill="url(#steelTextFront)">
+              <text class="t1" x="0" y="84" font-size="60">Raphaël Guiller</text>
+              <text class="t2" x="0" y="150" font-size="26">PAS D’APPLI. PAS DE STRESS. IL SUFFIT DE PASSER.</text>
+            </g>
+          </svg>
+        </div>
       </div>
 
-      <!-- FACE ARRIÈRE -->
-      <div class="face back engrave-back">
-        <svg viewBox="0 0 900 220" width="90%" xmlns="http://www.w3.org/2000/svg">
-          <use href="#engrave"/>
-          <text x="0" y="80">07 64 02 12 68</text>
-          <text x="0" y="130">rg.businesscard@gmail.com</text>
-          <text x="0" y="180">instagram.com/rg.card</text>
-        </svg>
+      <!-- FACE ARRIÈRE (numéro, email, Instagram — TOUS GRAVÉS) -->
+      <div class="face back">
+        <div class="rim"></div>
+        <div class="pad">
+          <svg viewBox="0 0 900 220" width="88%" xmlns="http://www.w3.org/2000/svg" aria-label="Contacts">
+            <defs>
+              <filter id="engraveBack" x="-50%" y="-50%" width="200%" height="200%">
+                <feOffset in="SourceAlpha" dx="1.4" dy="1.8" result="off1"/>
+                <feGaussianBlur in="off1" stdDeviation="1.4" result="blur1"/>
+                <feComposite in="blur1" in2="SourceAlpha" operator="out" result="inner1"/>
+                <feColorMatrix in="inner1" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .95 0" result="dark"/>
+                <feOffset in="SourceAlpha" dx="-1.2" dy="-1.2" result="off2"/>
+                <feGaussianBlur in="off2" stdDeviation="1.2" result="blur2"/>
+                <feComposite in="blur2" in2="SourceAlpha" operator="out" result="inner2"/>
+                <feColorMatrix in="inner2" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0" result="light"/>
+                <feMerge><feMergeNode in="dark"/><feMergeNode in="light"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <linearGradient id="steelTextBack" class="steelFill" x1="0" x2="0" y1="0" y2="1"/>
+            </defs>
+            <g filter="url(#engraveBack)" fill="url(#steelTextBack)">
+              <text class="t2" x="0" y="84">07 64 02 12 68</text>
+              <text class="t2" x="0" y="132">rg.businesscard@gmail.com</text>
+              <text class="t2" x="0" y="180">instagram.com/rg.card</text>
+            </g>
+          </svg>
+        </div>
       </div>
 
-      <!-- CÔTÉS -->
-      <div class="side right"></div>
+      <!-- CÔTÉS (épaisseur visible) -->
       <div class="side left"></div>
+      <div class="side right"></div>
       <div class="side top"></div>
       <div class="side bottom"></div>
     </div>
