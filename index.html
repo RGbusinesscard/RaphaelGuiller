@@ -1,96 +1,400 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Carte 3D Raphaël Guiller</title>
-<style>
-  :root{
-    --W: 340px;   /* largeur carte réaliste */
-    --H: 210px;   /* hauteur carte réaliste */
-    --D: 8px;     /* épaisseur fine */
-    --R: 20px;    /* arrondi bords */
-    --ink:#cfd3d8;
-    --steelFront:#1b1e23;
-    --steelBack:#171a1f;
-    --side:#111317;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    min-height:100vh;display:grid;place-items:center;
-    background:radial-gradient(circle at center,#0b0c0e,#14161a 70%);
-    font-family:system-ui,-apple-system,Inter,Segoe UI,Roboto,Arial,sans-serif;
-    color:var(--ink);
-  }
+  <meta charset="UTF-8" />
+  <title>Carte de visite – Stella Boudigou-Criado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg-main: #020617;      /* noir / bleu nuit */
+      --bg-card: rgba(15, 23, 42, 0.9);
+      --accent: #0ea5e9;       /* bleu clair */
+      --accent-soft: rgba(14, 165, 233, 0.15);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --border-subtle: rgba(148, 163, 184, 0.2);
+      --radius-xl: 1.75rem;
+    }
 
-  .scene{perspective:1200px}
-  .card{
-    position:relative;width:var(--W);height:var(--H);
-    transform-style:preserve-3d;
-    animation:spin 10s linear infinite;
-    filter:drop-shadow(0 16px 32px rgba(0,0,0,.6));
-  }
-  @keyframes spin{from{transform:rotateY(0deg)}to{transform:rotateY(360deg)}}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .face{
-    position:absolute;width:var(--W);height:var(--H);
-    border-radius:var(--R);
-    backface-visibility:hidden;-webkit-backface-visibility:hidden;
-    display:flex;align-items:center;justify-content:center;flex-direction:column;
-  }
-  .front{
-    background:linear-gradient(155deg,var(--steelFront),#0f1114);
-    transform:translateZ(calc(var(--D)/2));
-  }
-  .back{
-    background:linear-gradient(155deg,var(--steelBack),#0b0c0e);
-    transform:rotateY(180deg) translateZ(calc(var(--D)/2));
-  }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      background: radial-gradient(circle at top left, #0b1120 0%, #020617 45%, #000000 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
 
-  /* côtés fins */
-  .side{position:absolute;left:50%;top:50%;background:var(--side)}
-  .right,.left{width:var(--D);height:var(--H)}
-  .top,.bottom{width:var(--W);height:var(--D)}
-  .right {transform:translate(-50%,-50%) rotateY(90deg) translateZ(calc(var(--W)/2))}
-  .left  {transform:translate(-50%,-50%) rotateY(-90deg) translateZ(calc(var(--W)/2))}
-  .top   {transform:translate(-50%,-50%) rotateX(90deg) translateZ(calc(var(--H)/2))}
-  .bottom{transform:translate(-50%,-50%) rotateX(-90deg) translateZ(calc(var(--H)/2))}
+    .card {
+      width: 100%;
+      max-width: 960px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.85));
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-subtle);
+      box-shadow:
+        0 30px 80px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(148, 163, 184, 0.2);
+      padding: 28px 24px;
+      backdrop-filter: blur(18px);
+    }
 
-  /* Gravure */
-  .engrave{
-    color:var(--ink);
-    text-shadow:
-      0 1.5px 1.5px rgba(0,0,0,.95),
-      0 -1.2px 1px rgba(255,255,255,.4),
-      1px 0 1px rgba(0,0,0,.65),
-     -1px 0 1px rgba(255,255,255,.3);
-    text-align:center;
-  }
-  .name{font:700 28px "Georgia","Times New Roman",serif;margin-bottom:8px}
-  .tag {font:700 13px "Inter",sans-serif}
-  .line{font:700 16px "Inter",sans-serif;margin:4px 0}
-</style>
+    .card-inner {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+      gap: 28px;
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 22px 18px;
+        border-radius: 1.4rem;
+      }
+
+      .card-inner {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .identity {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.19em;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      width: fit-content;
+    }
+
+    .tag-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.8);
+    }
+
+    .name-block {
+      margin-top: 4px;
+    }
+
+    .name {
+      font-size: 1.65rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .name span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .role {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .role strong {
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    .contact-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: var(--text-main);
+    }
+
+    .contact-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--accent);
+    }
+
+    .contact-link {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .contact-link:hover {
+      text-decoration: underline;
+    }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.86rem;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      cursor: pointer;
+      transition:
+        transform 0.14s ease-out,
+        box-shadow 0.14s ease-out,
+        background 0.14s ease-out,
+        border-color 0.14s ease-out;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
+      color: #0b1120;
+      font-weight: 500;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn-outline {
+      border-color: var(--border-subtle);
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text-main);
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.8);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-icon svg {
+      width: 15px;
+      height: 15px;
+    }
+
+    .map-block {
+      position: relative;
+      padding: 16px;
+      border-radius: calc(var(--radius-xl) - 6px);
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.13), transparent 55%),
+                  radial-gradient(circle at bottom left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      overflow: hidden;
+    }
+
+    .map-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .map-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .map-pill {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .map-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
+    }
+
+    .map-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .map-outer {
+      margin-top: 6px;
+      border-radius: 1.3rem;
+      overflow: hidden;
+      border: 1px solid rgba(30, 64, 175, 0.8);
+      box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.9),
+        0 0 0 1px rgba(56, 189, 248, 0.22);
+      animation: floatMap 16s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatMap {
+      0% {
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        transform: translateY(-4px) scale(1.01);
+      }
+    }
+
+    .map-outer iframe {
+      width: 100%;
+      height: 260px;
+      border: 0;
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .map-outer iframe {
+        height: 220px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="scene">
-    <div class="card">
-      <!-- Recto -->
-      <div class="face front">
-        <div class="engrave name">Raphaël Guiller</div>
-        <div class="engrave tag">PAS D’APPLI. PAS DE STRESS.<br>IL SUFFIT DE PASSER.</div>
-      </div>
-      <!-- Verso -->
-      <div class="face back">
-        <div class="engrave line">07 64 02 12 68</div>
-        <div class="engrave line">rg.businesscard@gmail.com</div>
-        <div class="engrave line">instagram.com/rg.card</div>
-      </div>
-      <!-- Épaisseur -->
-      <div class="side right"></div>
-      <div class="side left"></div>
-      <div class="side top"></div>
-      <div class="side bottom"></div>
+  <main class="card">
+    <div class="card-inner">
+      <!-- Identité & contacts -->
+      <section class="identity">
+        <div class="tagline">
+          <span class="tag-dot"></span>
+          Carte de visite digitale
+        </div>
+
+        <div class="name-block">
+          <div class="name">
+            Stella <span>Boudigou-Criado</span>
+          </div>
+          <div class="subtitle">de Tempier</div>
+        </div>
+
+        <p class="role">
+          <strong>Contact direct</strong> via téléphone, e-mail ou Instagram.  
+          Mini-site pensé pour un accès rapide depuis une carte NFC.
+        </p>
+
+        <div class="contact-list">
+          <div class="contact-item">
+            <div class="contact-icon">☎</div>
+            <a class="contact-link" href="tel:+33787907380">
+              07&nbsp;87&nbsp;90&nbsp;73&nbsp;80
+            </a>
+          </div>
+          <div class="contact-item">
+            <div class="contact-icon">@</div>
+            <a class="contact-link" href="mailto:rg.businesscard@gmail.com">
+              rg.businesscard@gmail.com
+            </a>
+          </div>
+        </div>
+
+        <div class="actions">
+          <!-- Bouton Instagram -->
+          <a
+            class="btn btn-primary"
+            href="https://www.instagram.com/rg.card"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="btn-icon" aria-hidden="true">
+              <!-- Icône Instagram (SVG) -->
+              <svg viewBox="0 0 24 24">
+                <path fill="currentColor"
+                  d="M7 2C4.24 2 2 4.24 2 7v10c0 2.76 2.24 5 5 5h10c2.76 0 5-2.24 5-5V7c0-2.76-2.24-5-5-5H7zm0 2h10c1.66 0 3 1.34 3 3v10c0 1.66-1.34 3-3 3H7c-1.66 0-3-1.34-3-3V7c0-1.66 1.34-3 3-3zm9 1a1 1 0 100 2 1 1 0 000-2zM12 7a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
+              </svg>
+            </span>
+            <span>Instagram&nbsp;•&nbsp;@rg.card</span>
+          </a>
+
+          <!-- Bouton Mail -->
+          <a
+            class="btn btn-outline"
+            href="mailto:rg.businesscard@gmail.com"
+          >
+            <span class="btn-icon" aria-hidden="true">✉️</span>
+            <span>Envoyer un mail</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Localisation -->
+      <section class="map-block">
+        <div class="map-header">
+          <h2 class="map-title">Localisation</h2>
+          <div class="map-pill">
+            <span class="map-dot"></span>
+            Carte interactive
+          </div>
+        </div>
+        <p class="map-hint">
+          Dézoomez, déplacez la carte ou passez en mode plan&nbsp;: la localisation bouge
+          comme sur le site officiel de la carte.
+        </p>
+
+        <div class="map-outer">
+          <!--
+            🔧 À PERSONNALISER
+            1. Va sur Google Maps
+            2. Cherche ton adresse
+            3. Clique sur "Partager" > "Intégrer une carte"
+            4. Copie le lien <iframe> fourni par Google
+            5. Remplace tout l'iframe ci-dessous par le tien
+          -->
+          <iframe
+            src="https://www.google.com/maps/embed?pb=VOTRE_CODE_D_INTEGRATION_ICI"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+        </div>
+      </section>
     </div>
-  </div>
+  </main>
 </body>
 </html>
