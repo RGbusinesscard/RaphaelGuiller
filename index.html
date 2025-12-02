@@ -23,7 +23,7 @@ body{
   color:#fff;
 }
 
-/* FOND ANIMÉ PLUS MARQUÉ */
+/* FOND ANIMÉ MÉMORABLE */
 .bg{
   position:absolute;
   inset:0;
@@ -63,7 +63,7 @@ body{
   100%{transform:translate(-30px,-10px);}
 }
 
-/* CARTE MEMORABLE : flottement + légère rotation */
+/* CARTE MÉMORABLE : 3D + flottement */
 .card-shell{
   perspective:1200px;
   width:100%;
@@ -94,7 +94,7 @@ body{
   100%{transform:translateY(0) rotateX(0deg) rotateY(0deg);}
 }
 
-/* HEADER / LOGO + HALO */
+/* LOGO AVEC HALO */
 .logo-wrapper{
   display:flex;
   justify-content:center;
@@ -125,7 +125,7 @@ body{
   background:#fff;
 }
 
-/* INFOS TEXTE */
+/* INFOS */
 .infos{
   text-align:center;
   margin:18px 0 22px;
@@ -148,7 +148,6 @@ body{
   margin-top:4px;
 }
 
-/* LIGNE DE SÉPARATION DÉLICATE */
 .divider{
   height:1px;
   width:100%;
@@ -156,7 +155,7 @@ body{
   background:linear-gradient(90deg,transparent,#64748b66,transparent);
 }
 
-/* BOUTONS RONDS MÉMORABLES */
+/* BOUTONS RONDS */
 .actions{
   display:flex;
   justify-content:center;
@@ -184,7 +183,6 @@ body{
   box-shadow:0 8px 14px rgba(15,23,42,0.8);
 }
 
-/* Variantes couleur légère */
 .icon-btn.phone{
   background:radial-gradient(circle at 30% 0%,rgba(248,250,252,0.25),rgba(185,28,28,0.95));
   border-color:rgba(248,113,113,0.85);
@@ -198,7 +196,7 @@ body{
   border-color:rgba(52,211,153,0.9);
 }
 
-/* MAP CARD MEMORABLE */
+/* MAP */
 .map-card{
   margin-top:8px;
   border-radius:20px;
@@ -237,36 +235,6 @@ body{
   display:block;
 }
 
-/* BOUTON AVIS GOOGLE STAR MEMORABLE */
-.review-btn{
-  margin-top:14px;
-  padding:10px 14px;
-  border-radius:999px;
-  background:linear-gradient(135deg,#facc15,#f97316);
-  border:none;
-  text-align:center;
-  font-size:1.4rem;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  color:#1f2933;
-  text-decoration:none;
-  box-shadow:0 16px 30px rgba(251,191,36,0.65);
-  transition:transform .16s ease, box-shadow .16s ease, filter .16s ease;
-}
-.review-btn span.label{
-  font-size:.8rem;
-  text-transform:uppercase;
-  letter-spacing:.16em;
-  font-weight:600;
-}
-.review-btn:active{
-  transform:translateY(2px) scale(.97);
-  box-shadow:0 8px 18px rgba(251,191,36,0.7);
-  filter:brightness(.97);
-}
-
 /* FOOTER */
 .bottom{
   text-align:center;
@@ -275,17 +243,10 @@ body{
   font-size:.72rem;
 }
 
-/* Petites adaptations */
 @media (max-width:380px){
-  .card{
-    padding:22px 18px 22px;
-  }
-  .logo img{
-    width:180px;
-  }
-  .map-frame-wrapper{
-    height:200px;
-  }
+  .card{padding:22px 18px 22px;}
+  .logo img{width:180px;}
+  .map-frame-wrapper{height:200px;}
 }
 </style>
 </head>
@@ -299,7 +260,7 @@ body{
 <div class="card-shell">
   <div class="card">
 
-    <!-- LOGO AVEC HALO -->
+    <!-- LOGO -->
     <div class="logo-wrapper">
       <div class="logo-ring"></div>
       <div class="logo">
@@ -316,14 +277,14 @@ body{
 
     <div class="divider"></div>
 
-    <!-- BOUTONS RONDS MÉMORABLES -->
+    <!-- BOUTONS -->
     <div class="actions">
       <a href="tel:0673865797" class="icon-btn phone">📞</a>
       <a href="mailto:dlebesle@robert-platrerie.fr" class="icon-btn mail">✉️</a>
       <a href="https://www.robert-platriere-lemans.fr" class="icon-btn web" target="_blank">🌐</a>
     </div>
 
-    <!-- MAP INTERACTIVE -->
+    <!-- MAP -->
     <div class="map-card">
       <div class="map-header">
         <div class="map-title">Localisation</div>
@@ -338,16 +299,7 @@ body{
       </div>
     </div>
 
-    <!-- AVIS GOOGLE -->
-    <a class="review-btn"
-       href="https://search.google.com/local/writereview?placeid=TON_PLACE_ID_ICI"
-       target="_blank">
-      ⭐
-      <span class="label">Laisser un avis Google</span>
-    </a>
-
     <div class="bottom">Carte de visite dématérialisée – Ludovic Robert</div>
-
   </div>
 </div>
 
