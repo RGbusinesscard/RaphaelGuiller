@@ -23,7 +23,7 @@ body{
   color:#fff;
 }
 
-/* FOND ANIMÉ SOBRE ROUGE / ANTHRACITE */
+/* FOND ANIMÉ ROUGE / NOIR */
 .bg{
   position:absolute;
   inset:0;
@@ -41,7 +41,7 @@ body{
   100%{background-position:0% 50%;}
 }
 
-/* LÉGER HALO ROUGE */
+/* HALO ROUGE */
 .aura{
   position:absolute;
   width:380px;
@@ -78,7 +78,6 @@ body{
     0 24px 60px rgba(0,0,0,0.8),
     0 0 0 1px rgba(15,23,42,0.8);
   animation:popIn .7s ease, cardFloat 12s ease-in-out infinite;
-  transform-origin:center center;
 }
 @keyframes popIn{
   from{opacity:0;transform:translateY(16px) scale(.95);}
@@ -90,7 +89,7 @@ body{
   100%{transform:translateY(0);}
 }
 
-/* LOGO – SIMPLE, PROPRE, FIABLE */
+/* LOGO AVEC le BON NOM */
 .logo{
   display:flex;
   justify-content:center;
@@ -102,7 +101,7 @@ body{
   background:#f9fafb;
   box-shadow:0 12px 26px rgba(0,0,0,0.6);
 }
-. img src="IMG_7657.jpg" alt="Ludovic Robert - Artisan Plaquiste">
+.logo img{
   display:block;
   width:200px;
   max-width:100%;
@@ -120,7 +119,6 @@ body{
   font-size:.72rem;
   color:#e5e7eb;
   opacity:0.8;
-  margin-bottom:4px;
 }
 .infos .nom{
   font-size:1.24rem;
@@ -141,7 +139,7 @@ body{
   background:linear-gradient(90deg,transparent,#f87171aa,transparent);
 }
 
-/* BOUTONS RONDS (ROUGE / GRIS) */
+/* BOUTONS EMOJI RONDS */
 .actions{
   display:flex;
   justify-content:center;
@@ -156,29 +154,18 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  text-decoration:none;
   font-size:1.6rem;
   color:#f9fafb;
+  text-decoration:none;
   background:#0b1120;
   border:1px solid rgba(148,163,184,0.7);
   box-shadow:0 12px 24px rgba(0,0,0,0.75);
-  transition:transform .14s ease, box-shadow .14s ease, border-color .14s ease, background .14s ease;
+  transition:transform .14s ease;
 }
-.icon-btn:active{
-  transform:translateY(2px) scale(.96);
-  box-shadow:0 7px 14px rgba(0,0,0,0.8);
-}
-
-.icon-btn.phone{
-  background:linear-gradient(135deg,#b21f2d,#7f111d);
-  border-color:rgba(252,165,165,0.85);
-}
-.icon-btn.mail{
-  background:rgba(15,23,42,0.95);
-}
-.icon-btn.web{
-  background:rgba(15,23,42,0.95);
-}
+.icon-btn:active{transform:translateY(2px) scale(.96);}
+.icon-btn.phone{background:linear-gradient(135deg,#b21f2d,#7f111d);}
+.icon-btn.mail{background:rgba(15,23,42,0.95);}
+.icon-btn.web{background:rgba(15,23,42,0.95);}
 
 /* MAP */
 .map-card{
@@ -191,7 +178,6 @@ body{
 }
 .map-header{
   display:flex;
-  align-items:center;
   justify-content:space-between;
   padding:8px 12px 4px;
 }
@@ -200,7 +186,6 @@ body{
   text-transform:uppercase;
   letter-spacing:.14em;
   color:#f9fafb;
-  opacity:.85;
 }
 .map-tag{
   font-size:.65rem;
@@ -214,10 +199,9 @@ body{
   height:210px;
 }
 .map-frame-wrapper iframe{
-  border:0;
   width:100%;
   height:100%;
-  display:block;
+  border:0;
 }
 
 /* FOOTER */
@@ -226,12 +210,6 @@ body{
   margin-top:16px;
   color:#9ca3af;
   font-size:.72rem;
-}
-
-@media (max-width:380px){
-  .card{padding:22px 16px 20px;}
-  .logo img{width:180px;}
-  .map-frame-wrapper{height:190px;}
 }
 </style>
 </head>
@@ -244,14 +222,13 @@ body{
 <div class="card-shell">
   <div class="card">
 
-    <!-- LOGO (assure-toi que le fichier s'appelle bien IMG_7657.jpg) -->
+    <!-- LOGO (nom EXACT du fichier) -->
     <div class="logo">
       <div class="logo-inner">
-        <img src="IMG_7657.jpg" alt="Ludovic Robert - Artisan Plaquiste">
+        <img src="IMG_7657.JPG" alt="Logo">
       </div>
     </div>
 
-    <!-- INFOS -->
     <div class="infos">
       <div class="societe">Société LUDOVIC ROBERT</div>
       <div class="nom">Denis Lebesle</div>
@@ -260,14 +237,12 @@ body{
 
     <div class="divider"></div>
 
-    <!-- BOUTONS EMOJI -->
     <div class="actions">
       <a href="tel:0673865797" class="icon-btn phone">📞</a>
       <a href="mailto:dlebesle@robert-platrerie.fr" class="icon-btn mail">✉️</a>
       <a href="https://www.robert-platriere-lemans.fr" class="icon-btn web" target="_blank">🌐</a>
     </div>
 
-    <!-- MAP -->
     <div class="map-card">
       <div class="map-header">
         <div class="map-title">Localisation</div>
@@ -276,13 +251,13 @@ body{
       <div class="map-frame-wrapper">
         <iframe
           loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
           src="https://www.google.com/maps?q=Ludovic+Robert+Artisan+Plaquiste+Le+Mans&output=embed">
         </iframe>
       </div>
     </div>
 
     <div class="bottom">Carte de visite dématérialisée – Ludovic Robert</div>
+
   </div>
 </div>
 
